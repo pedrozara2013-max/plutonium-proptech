@@ -1,0 +1,8 @@
+import { createClient } from '@/lib/supabase/server'
+import { InvestmentOpportunityCard } from '@/components/investment-opportunity-card'
+
+export default async function InvestmentsPage() {
+  const supabase = await createClient()
+  const { data: projects } = await supabase.from('investment_projects').select('*').in('project_status', ['open', 'funding', 'funded', 'active', 'completed']).order('created_at', { ascending: false })
+  return <main className="min-h-screen bg-[#f7f9fc] px-5 py-16"><div className="mx-auto max-w-6xl"><p className="section-kicker">Plutonium Capital</p><h1 className="section-title max-w-3xl">Oportunidades de <span>investimento</span></h1><p className="mt-5 max-w-2xl text-lg leading-8 text-[#58708f]">Explore oportunidades imobiliárias selecionadas e manifeste o seu interesse com segurança.</p><div className="mt-10 grid gap-6 md:grid-cols-2">{(projects ?? []).map((project) => <InvestmentOpportunityCard key={project.id} project={{ id: project.id, title: project.title, slug: project.slug, description: project.description, location: project.location ?? '', minimumInvestment: Number(project.minimum_investment), targetAmount: Number(project.target_amount), raisedAmount: Number(project.raised_amount), currency: project.currency, projectStatus: project.project_status, expectedReturn: project.expected_return ?? '', investmentPeriod: project.investment_period ?? '', riskDisclosure: project.risk_disclosure ?? '', startDate: project.start_date, endDate: project.end_date }} />)}</div>{!projects?.length && <div className="mt-10 rounded-2xl border border-dashed border-[#b9c9dc] bg-white p-12 text-center text-[#58708f]">Não existem oportunidades abertas neste momento.</div>}</div></main>
+}

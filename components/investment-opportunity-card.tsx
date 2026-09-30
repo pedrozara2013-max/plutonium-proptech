@@ -1,0 +1,7 @@
+import Link from 'next/link'
+import type { InvestmentProject } from '@/types/domain'
+
+export function InvestmentOpportunityCard({ project }: { project: InvestmentProject }) {
+  const progress = project.targetAmount ? Math.min(100, Math.round((project.raisedAmount / project.targetAmount) * 100)) : 0
+  return <article className="rounded-2xl border border-[#dbe4f0] bg-white p-6 shadow-sm"><div className="flex items-start justify-between gap-4"><div><p className="section-kicker">Oportunidade</p><h2 className="mt-2 text-2xl font-semibold text-[#071d3d]">{project.title}</h2><p className="mt-1 text-sm text-[#58708f]">{project.location || 'Angola'}</p></div><span className="rounded-full bg-[#eaf1fa] px-3 py-1 text-xs font-semibold text-[#0b3d91]">{project.projectStatus}</span></div><p className="mt-5 line-clamp-3 text-sm leading-6 text-[#58708f]">{project.description}</p><div className="mt-5"><div className="mb-2 flex justify-between text-xs text-[#58708f]"><span>Captação</span><span>{progress}%</span></div><div className="h-2 overflow-hidden rounded-full bg-[#eaf1fa]"><div className="h-full rounded-full bg-[#0b3d91]" style={{ width: `${progress}%` }} /></div></div><div className="mt-6 flex items-center justify-between"><p className="text-sm text-[#58708f]">Mínimo <strong className="text-[#071d3d]">{project.minimumInvestment.toLocaleString('pt-PT')} AOA</strong></p><Link href={`/investments/${project.slug}`} className="rounded-xl bg-[#0b3d91] px-4 py-2 text-sm font-semibold text-white">Ver oportunidade</Link></div></article>
+}

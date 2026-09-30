@@ -1,0 +1,13 @@
+import { notFound } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth'
+import { submitInvestmentInterest } from '../actions'
+
+export default async function InvestmentDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const supabase = await createClient()
+  const { data: project } = await supabase.from('investment_projects').select('*').eq('slug', slug).in('project_status', ['open', 'funding']).single()
+  if (!project) notFound()
+  const { data: user } = await supabase.auth.getUser()
+  return <main className="min-h-screen bg-[#f7f9fc] px-5 py-16"><div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.4fr_.8fr]"><article className="rounded-3xl border border-[#dbe4f0] bg-white p-8"><p className="section-kicker">Oportunidade de investimento</p><h1 className="section-title">{project.title}</h1><p className="mt-6 text-lg leading-8 text-[#58708f]">{project.description}</p><div className="mt-8 grid gap-4 sm:grid-cols-3"><div><p className="text-xs uppercase text-[#58708f]">Mínimo</p><strong>{Number(project.minimum_investment).toLocaleString('pt-PT')} {project.currency}</strong></div><div><p className="text-xs uppercase text-[#58708f]">Objetivo</p><strong>{Number(project.target_amount).toLocaleString('pt-PT')} {project.currency}</strong></div><div><p className="text-xs uppercase text-[#58708f]">Retorno esperado</p><strong>{project.expected_return || 'A avaliar'}</strong></div></div><p className="mt-10 rounded-2xl bg-[#fff7e8] p-5 text-sm leading-6 text-[#765719]">{project.risk_disclosure || 'Investimentos envolvem risco. Analise a documentação antes de tomar qualquer decisão.'}</p></article><aside className="rounded-3xl border border-[#dbe4f0] bg-white p-6 shadow-sm"><h2 className="text-xl font-semibold text-[#071d3d]">Manifestar interesse</h2>{user ? <form action={submitInvestmentInterest} className="mt-5 space-y-4"><input type="hidden" name="projectId" value={project.id} /><label className="block text-sm font-medium">Valor pretendido<input name="amount" type="number" min={Number(project.minimum_investment)} step="0.01" required className="auth-input mt-2" /></label><label className="block text-sm font-medium">Notas<textarea name="notes" rows={4} className="auth-input mt-2" placeholder="Como podemos ajudar?" /></label><button className="w-full rounded-xl bg-[#0b3d91] px-4 py-3 font-semibold text-white">Enviar interesse</button></form> : <a href="/login?next=/investments" className="mt-5 block rounded-xl bg-[#0b3d91] px-4 py-3 text-center font-semibold text-white">Entrar para continuar</a>}</aside></div></main>
+}
