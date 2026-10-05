@@ -32,8 +32,17 @@ export function assertQaEnvironment() {
 }
 
 export function getQaEnvironmentStatus() {
+  const appEnvironment = process.env.NEXT_PUBLIC_APP_ENV ?? ''
+  const configuredProjectRef = process.env.SUPABASE_PROJECT_REF ?? ''
+  const stagingProjectRef = process.env.STAGING_SUPABASE_PROJECT_REF ?? ''
+
   return {
-    environment: getAppEnvironment(),
+    environmentConfigured: Boolean(appEnvironment),
+    environmentIsStaging: appEnvironment === 'staging',
+    supabaseProjectConfigured: Boolean(configuredProjectRef),
+    stagingProjectConfigured: Boolean(stagingProjectRef),
+    projectMatchesStaging: Boolean(configuredProjectRef && stagingProjectRef && configuredProjectRef === stagingProjectRef),
+    projectIsProduction: configuredProjectRef === KNOWN_PRODUCTION_PROJECT_REF,
     isConfirmedStaging: isConfirmedStagingEnvironment(),
   }
 }
