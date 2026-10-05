@@ -1,6 +1,7 @@
 export type AppEnvironment = 'development' | 'staging' | 'production' | 'unknown'
 
 const APP_ENVIRONMENTS = new Set<AppEnvironment>(['development', 'staging', 'production'])
+const KNOWN_PRODUCTION_PROJECT_REF = 'wtsiaxptfeoanoxhsths'
 
 export function getAppEnvironment(): AppEnvironment {
   const value = process.env.NEXT_PUBLIC_APP_ENV
@@ -18,7 +19,10 @@ export function isConfirmedStagingEnvironment() {
   const configuredProjectRef = process.env.SUPABASE_PROJECT_REF
   const stagingProjectRef = process.env.STAGING_SUPABASE_PROJECT_REF
 
-  return getAppEnvironment() === 'staging' && Boolean(configuredProjectRef && stagingProjectRef && configuredProjectRef === stagingProjectRef)
+  return getAppEnvironment() === 'staging'
+    && Boolean(configuredProjectRef && stagingProjectRef)
+    && configuredProjectRef === stagingProjectRef
+    && configuredProjectRef !== KNOWN_PRODUCTION_PROJECT_REF
 }
 
 export function assertQaEnvironment() {
